@@ -1,0 +1,19 @@
+name = "wishlist-icon"
+type = "theme"
+
+[[blocks]]
+name   = "Wishlist Button"
+target = "product-card"         # or "product" if you prefer
+path   = "blocks/wishlist-button.liquid"
+
+[[blocks]]
+name   = "Wishlist Page"
+target = "page"
+path   = "blocks/wishlist-page.liquid"
+
+
+[[blocks]]
+name   = "Catlog Heart Icon"
+target = "product-card"
+path   = "blocks/heart-icon.liquid"
+

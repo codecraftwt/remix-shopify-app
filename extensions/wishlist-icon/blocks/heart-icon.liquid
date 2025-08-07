@@ -1,0 +1,195 @@
+<div
+  x-data="wishlist"
+  x-init="init()"
+  x-cloak
+  class="catalog-heart"
+  data-customer-id="{{ customer.id }}"
+  data-product-title="{{ product.title | escape }}"
+  data-price="{{ product.price | money_without_currency }}"
+>
+  <template x-if="!isWishlisted">
+    <div>
+      <svg
+        @click="toggleWishlist()"
+        xmlns="http://www.w3.org/2000/svg"
+        viewBox="0 0 24 24"
+        class="icon-heart"
+        aria-hidden="true"
+      >
+        <path
+          d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5
+             2 5.42 4.42 3 7.5 3c1.74 0 3.41 0.81 4.5 2.09
+             C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5
+             c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"
+        />
+      </svg>
+    </div>
+  </template>
+
+  <template x-if="isWishlisted">
+    <div>
+      <svg
+        @click="toggleWishlist()"
+        xmlns="http://www.w3.org/2000/svg"
+        viewBox="0 0 24 24"
+        class="icon-heart filled"
+        aria-hidden="true"
+      >
+        <path
+          d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5
+             2 5.42 4.42 3 7.5 3c1.74 0 3.41 0.81 4.5 2.09
+             C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5
+             c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"
+        />
+      </svg>
+    </div>
+  </template>
+</div>
+
+<script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+<script>
+  document.addEventListener('alpine:init', () => {
+    Alpine.data('wishlist', () => ({
+      apiUrl : "https://judicial-leo-found-prozac.trycloudflare.com",
+      customerId: null,
+      productId: null,
+      productTitle: null,
+      price: null,
+      delete_id : null,
+      wishlist: [],
+      allWishlistData: [],
+      isWishlisted: false,
+
+        async init() {
+          this.customerId = this.$el.dataset.customerId;
+          await this.fetchWishlist();
+
+          const parentElement = this.$el.closest('.catalog-heart-container');
+          if (parentElement) {
+              const parentProductId = parentElement.dataset.productId;
+              this.productId = parentProductId;
+
+              this.isWishlisted = this.wishlist.includes(parentProductId.toString());
+          } else {
+              console.log('Parent div with class "catalog-heart-container" not found');
+          }
+        },
+
+        async fetchWishlist() {
+                try {
+                const res  = await fetch(`${this.apiUrl}/api/wishlist?customerId=${this.customerId}`);
+                const data = await res.json();
+                this.allWishlistData = data.wishlists;
+                this.wishlist = data.wishlists.map(item => item.productId || item.id);
+                } catch (e) {
+                console.error("Error fetching wishlist:", e);
+                }
+        },
+
+        toggleWishlist() {
+          this.isWishlisted
+            ? this.remove()
+            : this.addtoWishlist();
+        },
+
+        addtoWishlist() {
+          const parentElement = this.$el.closest('.catalog-heart-container');
+          if (parentElement) {
+            this.productTitle = parentElement.dataset.productTitle;
+            this.price = parentElement.dataset.price;
+          }
+          const productImage = "{{ product.featured_image | img_url: 'master' }}";
+          console.log(productImage,"productImage");
+
+          var formData = new FormData();
+          formData.append('customerId', this.customerId);
+          formData.append('productId', this.productId);
+          formData.append("productTitle", this.productTitle);
+          formData.append("quantity", "1");
+          formData.append("price", this.price);
+          formData.append("shop", "{{shop.permanent_domain}}");
+          formData.append("productImage", "{{ product.featured_image | img_url: 'master' }}");
+
+           var requestOptions = {
+            method:"POST",
+            body: formData,
+            redirect: 'follow'
+          };
+          fetch(this.apiUrl +"/api/wishlist", requestOptions)
+            .then(response => response.text())
+            .then(result => {
+            alert("Item added to Wishlist!");
+            this.refresh();
+            this.productTitle = null;
+            this.price = null;
+          })
+          .catch(error => console.log("error : ",error))
+        },
+
+        async remove() {
+          if(this.allWishlistData){
+          const selectedWishlist = this.allWishlistData.filter(item => item.productId === this.productId);
+          this.delete_id = selectedWishlist[0]?.id;
+          }
+         if (!this.delete_id) {
+          console.warn('No id on product, cannot delete');
+          return;
+          }
+          try {
+            const res = await fetch(`${this.apiUrl}/api/wishlist`, {
+              method: "POST",
+              credentials: "include",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({ action: "DELETE", id:this.delete_id }),
+            });
+
+            if (!res.ok) {
+              throw new Error(`Delete failed: ${res.status}`);
+            }
+
+            await this.refresh();
+            alert('Item removed from Wishlist!');
+          } catch (err) {
+            console.error('Failed to remove wishlist item:', err);
+          }
+        },
+
+        async refresh() {
+        try {
+          await this.fetchWishlist();
+          this.isWishlisted = this.wishlist.includes(String(this.productId));
+        } catch (e) {
+          console.error("Error refreshing wishlist:", e);
+        }
+      },
+    }));
+  });
+</script>
+
+<style>
+  .icon-heart {
+    width: 24px;
+    height: 24px;
+    fill: none;
+    stroke: red;
+    stroke-width: 2;
+    transition: fill 0.3s ease, stroke 0.3s ease;
+    cursor: pointer;
+  }
+  .icon-heart.filled {
+    fill: red;
+    stroke: red;
+  }
+</style>
+
+{% schema %}
+{
+  "name": "Catalog Heart Icon",
+  "target": "section",
+  "settings": [
+    { "type": "product", "id": "product", "label": "product", "autofill": true },
+  ]
+}
+{% endschema %}

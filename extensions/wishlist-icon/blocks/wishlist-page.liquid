@@ -1,0 +1,323 @@
+<section
+  class="wishlist-page"
+  x-data="wishlist"
+  x-init="init()"
+  data-customer-id="{{ customer.id }}"
+>
+  
+  <div class="title-button">
+    <h1 style="font-size: 2rem; margin-bottom: 1rem;">Your Wishlist</h1>
+    <div>
+     <button class="remove" @click="removeAllProducts()">Remove All</button>
+    </div>
+
+  </div>
+  
+
+  <!-- Empty state -->
+  <template x-if="items.length === 0 && !isLoading">
+    <div style="padding: 1.5rem; text-align: center; color: #666;">
+      <p>Your wishlist is empty.</p>
+      <a href="/collections/all" style="color: #0066c0; text-decoration: underline;">
+        Browse products →
+      </a>
+    </div>
+  </template>
+
+  <!-- loading state -->
+  <template x-if="isLoading">
+    <div style="padding: 1.5rem; text-align: center; color: #666;">
+      <p>Loading...</p>
+    </div>
+  </template>
+
+  <!-- Loop over wishlist items -->
+  <div class="wishlist-container" x-show="items.length > 0">
+    <template x-for="item in items">
+                    <div class="wishlist-card">
+                        <button @click="remove(item)" class="close-btn" aria-label="Remove"> X </button>
+                        <!-- Product image -->
+                        <img 
+                            :src="item.imageUrl" 
+                            :alt="item.productTitle" 
+                            class="card-image"
+                        />
+
+                        <div class="card-content">
+                            <!-- Product title -->
+                            <h2 class="card-title" x-text="item.productTitle"></h2>
+                            
+                            <!-- Price & quantity -->
+                            <div class="card-details">
+                                <div class="price">Price: $<span x-text="item.price.toFixed(2)"></span></div>
+                                <div class="qty">Qty: <span x-text="item.quantity"></span></div>
+                            </div>
+                            
+                            <!-- Action buttons -->
+                            <div class="card-actions">
+                                <button 
+                                    @click="addToCart(item)"
+                                    class="add-to-cart"
+                                >
+                                    Add to cart
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+    </template>           
+  </div>
+</section>
+
+<!-- Alpine.js -->
+<script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+<script>
+  document.addEventListener('alpine:init', () => {
+    Alpine.data('wishlist', () => ({
+      apiUrl : "https://judicial-leo-found-prozac.trycloudflare.com",
+      customerId : null,
+      items: [],
+      Ids: [],
+      isLoading: false,
+
+      async init() {
+       this.customerId = this.$el.dataset.customerId;
+       this.fetchWishlist();
+      },
+
+      async fetchWishlist() {
+         try{
+          this.isLoading = true;
+          const url = `${this.apiUrl}/api/wishlist?customerId=${encodeURIComponent(this.customerId)}`;
+          const res = await fetch(url, {
+            method: 'GET',
+            headers: { 'Accept': 'application/json' }
+          });
+          
+          // Check content type before parsing
+          const contentType = res.headers.get('content-type');
+          if (!contentType || !contentType.includes('application/json')) {
+            const text = await res.text();
+            throw new Error(`Invalid response: ${text.slice(0, 100)}`);
+          }
+          
+          if (!res.ok) {
+            const errorData = await res.json();
+            throw new Error(errorData.error || `HTTP error! Status: ${res.status}`);
+          }
+          
+          const data = await res.json();
+          let allIds = data.wishlists.map(item => item.id);
+          this.Ids = allIds;
+          let testData = data.wishlists.map(item => ({
+            ...item,
+            price: parseFloat(item.price),
+            imageUrl: item.productImage || 'https://picsum.photos/200/300'
+          }));
+          this.items = testData;
+          this.isLoading = false;
+        }catch(error){
+          this.isLoading = false;
+          console.error("Failed to load wishlist:", error);
+        }
+      },
+
+      async remove(product) {
+        if (!product.id) {
+          console.warn("No id on product, cannot delete");
+          return;
+        }
+        try {
+          const res = await fetch(`${this.apiUrl}/api/wishlist`, {
+            method: "POST",
+            credentials: "include",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              action: "DELETE",
+              id: product.id
+            }),
+          });
+
+          if (!res.ok) {
+            throw new Error(`Delete failed: ${res.status}`);
+          }
+          await this.fetchWishlist();
+          alert("Item removed successfully!");
+        } catch (err) {
+          console.error("Failed to remove wishlist item:", err);
+        }
+      },
+
+      async removeAllProducts() {
+        if (!this.Ids || this.Ids.length === 0) {
+          console.warn("No IDs to remove");
+          return;
+        }
+        try {
+          const res = await fetch(`${this.apiUrl}/api/wishlist`, {
+            method: "POST",
+            credentials: "include",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              action: "DELETE",
+              ids: this.Ids
+            }),
+          });
+
+          if (!res.ok) {
+            throw new Error(`Delete failed: ${res.status}`);
+          }
+          await this.fetchWishlist();
+          alert("All items removed successfully!");
+        } catch (error) {
+          console.error("Failed to remove wishlist items:", error);
+        }
+      },
+
+      addToCart(product){
+        console.log(product,"product")
+      },
+    }));
+  });
+</script>
+
+<style>
+
+  .title-button{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:20px;
+  }
+  .close-btn{
+    position:absolute;
+    top:10px;
+    right:10px;
+    background:transparent;
+    color:black;
+    border-radius: 5px;
+    cursor:pointer;
+  }
+  .close-btn:hover{
+    background-color:black;
+    color:white;
+  }
+  .wishlist-card:hover {
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  }
+  .wishlist-card button:focus {
+    outline: 2px solid #d32f2f;
+    outline-offset: 2px;
+  }
+  .wishlist-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 1.5rem;
+        }
+        
+        .wishlist-card {
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            display: flex;
+            flex-wrap: wrap;
+            flex-direction: column;
+        }
+        
+        .wishlist-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.12);
+        }
+        
+        .card-image {
+            height: auto;
+            max-height: 250px;
+            width: 100%;
+            object-fit: contain;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .card-content {
+            padding: 1.2rem;
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .card-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 0.8rem;
+            color: #2c3e50;
+        }
+        
+        .card-details {
+            margin-bottom: 1.2rem;
+            background: #f9f9f9;
+            padding: 0.6rem;
+            border-radius: 6px;
+        }
+        
+        .price {
+            font-size:15px;
+            font-weight: 600;
+            color: #27ae60;
+        }
+        
+        .qty {
+            border:none;
+            font-size:15px;
+            font-weight: 600;
+        }
+        
+        .card-actions {
+            display: flex;
+            gap: 0.8rem;
+            margin-top: auto;
+        }
+        
+        .add-to-cart {
+            flex: 1;
+            background: black;
+            color: white;
+            border: none;
+            padding: 0.7rem;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        
+        .add-to-cart:hover {
+            background: #219653;
+        }
+        
+        .remove {
+            flex: 1;
+            background: #e74c3c;
+            color: white;
+            border: none;
+            padding: 0.7rem;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        
+        .remove:hover {
+            background: #c0392b;
+        }
+</style>
+
+{% schema %}
+{
+  "name": "Wishlist Page",
+  "target": "section",
+  "settings": []
+}
+{% endschema %}

@@ -1,0 +1,83 @@
+<div class="wishlist-button" x-data="wishlist">
+
+  <button type="button" @click="addtoWishlist" style="display: inline-flex; justify-content: center; align-items: center; width: 96%; height: 50px; background-color: #000; color: #fff; font-size: 1.4rem; font-weight: 500; border: none; border-radius: 4px; cursor: pointer;">
+    <!-- Heart icon SVG on the left -->
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="24" height="24" style="margin-right: 0.5rem;">
+      <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5
+              2 5.42 4.42 3 7.5 3c1.74 0 3.41 0.81 4.5 2.09
+              C13.09 3.81 14.76 3 16.5 3
+              19.58 3 22 5.42 22 8.5
+              c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+    </svg>
+    Add to WishList
+  </button>
+
+  <!-- Banner (hidden by default) -->
+  <div x-show="showBanner" x-transition class="polaris-banner">
+    Product added to wishlist!
+  </div>
+</div>
+
+<script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+
+    <script>
+        document.addEventListener('alpine:init', () => {
+            Alpine.data('wishlist', () => ({
+                wishlisted: false,
+                showBanner: false,
+                apiUrl : "https://judicial-leo-found-prozac.trycloudflare.com",
+
+                addtoWishlist() {
+                    var formData = new FormData();
+                     formData.append("customerId", "{{customer.id}}");
+                     formData.append("productId", "{{product.id}}");
+                     formData.append("productTitle", "{{ product.title | escape }}");
+                     formData.append("quantity", "1");
+                     formData.append("price", "{{product.price | money_without_currency}}");
+                     formData.append("shop", "{{shop.permanent_domain}}");
+                     formData.append("productImage", "{{ product.featured_image | img_url: 'master' }}");
+
+                     var requestOptions = {
+                      method:"POST",
+                      body: formData,
+                      redirect: 'follow'
+                     };
+
+                    fetch(this.apiUrl +"/api/wishlist", requestOptions)
+                    .then(response => response.text())
+                    .then(result => {
+                      this.showBanner = true;
+                      setTimeout(() => {
+                       alert('Item Wishlisted successfully!');
+                       this.showBanner = false;
+                      }, 2000);
+                    })
+                    .catch(error => console.log("error : ",error))
+                }
+            }))
+        })
+    </script>
+
+<style>
+.polaris-banner {
+  background-color: #e0f3e0;
+  border: 1px solid #50b83c;
+  color: #108043;
+  padding: 12px 16px;
+  margin-bottom: 12px;
+  border-radius: 4px;
+  font-weight: 500;
+}
+</style>
+
+{% schema %}
+{
+  "name": "Star Rating",
+  "target": "section",
+  "settings": [
+    { "type": "product", "id": "product", "label": "product", "autofill": true },
+    { "type": "color", "id": "colour", "label": "Star Colour", "default": "#ff0000" }
+  ]
+}
+{% endschema %}
+
