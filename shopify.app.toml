@@ -3,7 +3,7 @@
 client_id = "299a9a9f32a21f497dab810906d3fd09"
 name = "wishlist-inspire"
 handle = "wishlist-inspire-373"
-application_url = "https://judicial-leo-found-prozac.trycloudflare.com"
+application_url = "https://primarily-three-durham-jon.trycloudflare.com"
 embedded = true
 
 [build]
@@ -17,9 +17,9 @@ scopes = "write_products"
 
 [auth]
 redirect_urls = [
-  "https://judicial-leo-found-prozac.trycloudflare.com/auth/callback",
-  "https://judicial-leo-found-prozac.trycloudflare.com/auth/shopify/callback",
-  "https://judicial-leo-found-prozac.trycloudflare.com/api/auth/callback"
+  "https://primarily-three-durham-jon.trycloudflare.com/auth/callback",
+  "https://primarily-three-durham-jon.trycloudflare.com/auth/shopify/callback",
+  "https://primarily-three-durham-jon.trycloudflare.com/api/auth/callback"
 ]
 
 [webhooks]

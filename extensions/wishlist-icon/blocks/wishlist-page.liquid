@@ -10,9 +10,7 @@
     <div>
      <button class="remove" @click="removeAllProducts()">Remove All</button>
     </div>
-
   </div>
-  
 
   <!-- Empty state -->
   <template x-if="items.length === 0 && !isLoading">
@@ -73,7 +71,7 @@
 <script>
   document.addEventListener('alpine:init', () => {
     Alpine.data('wishlist', () => ({
-      apiUrl : "https://judicial-leo-found-prozac.trycloudflare.com",
+      apiUrl : "https://primarily-three-durham-jon.trycloudflare.com",
       customerId : null,
       items: [],
       Ids: [],
@@ -81,7 +79,7 @@
 
       async init() {
        this.customerId = this.$el.dataset.customerId;
-       this.fetchWishlist();
+       await this.fetchWishlist();
       },
 
       async fetchWishlist() {
