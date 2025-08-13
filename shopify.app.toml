@@ -3,7 +3,7 @@
 client_id = "299a9a9f32a21f497dab810906d3fd09"
 name = "wishlist-inspire"
 handle = "wishlist-inspire-373"
-application_url = "https://mirrors-presence-budgets-ethical.trycloudflare.com"
+application_url = "https://deliver-api-inspired-palestinian.trycloudflare.com"
 embedded = true
 
 [build]
@@ -17,9 +17,9 @@ scopes = "write_products"
 
 [auth]
 redirect_urls = [
-  "https://mirrors-presence-budgets-ethical.trycloudflare.com/auth/callback",
-  "https://mirrors-presence-budgets-ethical.trycloudflare.com/auth/shopify/callback",
-  "https://mirrors-presence-budgets-ethical.trycloudflare.com/api/auth/callback"
+  "https://deliver-api-inspired-palestinian.trycloudflare.com/auth/callback",
+  "https://deliver-api-inspired-palestinian.trycloudflare.com/auth/shopify/callback",
+  "https://deliver-api-inspired-palestinian.trycloudflare.com/api/auth/callback"
 ]
 
 [webhooks]

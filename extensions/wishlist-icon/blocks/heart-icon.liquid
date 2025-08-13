@@ -50,7 +50,7 @@
 <script>
   document.addEventListener('alpine:init', () => {
     Alpine.data('wishlist', () => ({
-      apiUrl : "https://mirrors-presence-budgets-ethical.trycloudflare.com",
+      apiUrl : "https://deliver-api-inspired-palestinian.trycloudflare.com",
       customerId: null,
       productId: null,
       productTitle: null,
@@ -60,103 +60,119 @@
       allWishlistData: [],
       isWishlisted: false,
 
-        async init() {
-          this.customerId = this.$el.dataset.customerId;
-          await this.fetchWishlist();
+      async init() {
+        this.customerId = this.$el.dataset.customerId || null;
+        await this.fetchWishlist();
 
-          const parentElement = this.$el.closest('.catalog-heart-container');
-          if (parentElement) {
-              const parentProductId = parentElement.dataset.productId;
-              this.productId = parentProductId;
+        const parentElement = this.$el.closest('.catalog-heart-container');
+        if (parentElement) {
+            const parentProductId = parentElement.dataset.productId;
+            this.productId = parentProductId;
+            this.isWishlisted = this.wishlist.includes(String(parentProductId));
+        } else {
+            console.log('Parent div with class "catalog-heart-container" not found');
+        }
+      },
 
-              this.isWishlisted = this.wishlist.includes(parentProductId.toString());
-          } else {
-              console.log('Parent div with class "catalog-heart-container" not found');
+      async fetchWishlist() {
+        try {
+          // include credentials so cookies are sent/accepted
+          const url = `${this.apiUrl}/api/wishlist${this.customerId ? `?customerId=${this.customerId}` : ''}`;
+          const res  = await fetch(url, { credentials: "include" });
+          if (!res.ok) {
+            console.error("Failed to fetch wishlist:", res.status);
+            return;
           }
-        },
+          const data = await res.json();
+          this.allWishlistData = data.wishlists || [];
+          // normalize wishlist as array of productIds (string)
+          this.wishlist = this.allWishlistData.map(item => String(item.productId || item.id));
+        } catch (e) {
+          console.error("Error fetching wishlist:", e);
+        }
+      },
 
-        async fetchWishlist() {
-                try {
-                const res  = await fetch(`${this.apiUrl}/api/wishlist?customerId=${this.customerId}`);
-                const data = await res.json();
-                this.allWishlistData = data.wishlists;
-                this.wishlist = data.wishlists.map(item => item.productId || item.id);
-                } catch (e) {
-                console.error("Error fetching wishlist:", e);
-                }
-        },
+      toggleWishlist() {
+        this.isWishlisted ? this.remove() : this.addtoWishlist();
+      },
 
-        toggleWishlist() {
-          this.isWishlisted
-            ? this.remove()
-            : this.addtoWishlist();
-        },
+      addtoWishlist() {
+        const parentElement = this.$el.closest('.catalog-heart-container');
+        if (parentElement) {
+          this.productTitle = parentElement.dataset.productTitle;
+          this.price = parentElement.dataset.price;
+        }
 
-        addtoWishlist() {
-          const parentElement = this.$el.closest('.catalog-heart-container');
-          if (parentElement) {
-            this.productTitle = parentElement.dataset.productTitle;
-            this.price = parentElement.dataset.price;
-          }
-          const productImage = "{{ product.featured_image | img_url: 'master' }}";
-          console.log(productImage,"productImage");
+        // send formData (works for both guest and logged-in)
+        var formData = new FormData();
+        formData.append('customerId', this.customerId || '');
+        formData.append('productId', this.productId);
+        formData.append("productTitle", this.productTitle);
+        formData.append("quantity", "1");
+        formData.append("price", this.price);
+        formData.append("shop", "{{shop.permanent_domain}}");
+        formData.append("productImage", "{{ product.featured_image | img_url: 'master' }}");
 
-          var formData = new FormData();
-          formData.append('customerId', this.customerId);
-          formData.append('productId', this.productId);
-          formData.append("productTitle", this.productTitle);
-          formData.append("quantity", "1");
-          formData.append("price", this.price);
-          formData.append("shop", "{{shop.permanent_domain}}");
-          formData.append("productImage", "{{ product.featured_image | img_url: 'master' }}");
+        var requestOptions = {
+          method:"POST",
+          body: formData,
+          redirect: 'follow',
+          credentials: "include" // important for cookie flows
+        };
 
-           var requestOptions = {
-            method:"POST",
-            body: formData,
-            redirect: 'follow'
-          };
-          fetch(this.apiUrl +"/api/wishlist", requestOptions)
-            .then(response => response.text())
-            .then(result => {
-            alert("Item added to Wishlist!");
-            this.refresh();
-            this.productTitle = null;
-            this.price = null;
+        fetch(this.apiUrl + "/api/wishlist", requestOptions)
+          .then(async (result) => {
+            if (result.ok) {
+              // update local state based on returned wishlists if provided
+              const response = await result.json().catch(() => ({}));
+              if (response.wishlists) {
+                this.allWishlistData = response.wishlists;
+                this.wishlist = this.allWishlistData.map(item => String(item.productId || item.id));
+              }
+              alert("Item added to Wishlist!");
+              this.refresh();
+              this.productTitle = null;
+              this.price = null;
+            } else {
+              console.error("Add to wishlist failed", result.status);
+            }
           })
-          .catch(error => console.log("error : ",error))
-        },
+          .catch(error => console.log("error : ",error));
+      },
 
-        async remove() {
-          if(this.allWishlistData){
-          const selectedWishlist = this.allWishlistData.filter(item => item.productId === this.productId);
-          this.delete_id = selectedWishlist[0]?.id;
-          }
-         if (!this.delete_id) {
+      async remove() {
+        if (this.allWishlistData && this.allWishlistData.length) {
+          const selectedWishlist = this.allWishlistData.filter(item => String(item.productId) === String(this.productId) || String(item.id) === String(this.productId));
+          this.delete_id = selectedWishlist[0]?.id || selectedWishlist[0]?.productId;
+        }
+
+        if (!this.delete_id) {
           console.warn('No id on product, cannot delete');
           return;
+        }
+
+        try {
+          const res = await fetch(`${this.apiUrl}/api/wishlist`, {
+            method: "POST",
+            credentials: "include",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ action: "DELETE", id: this.delete_id, customerId: this.customerId || undefined }),
+          });
+
+          if (!res.ok) {
+            throw new Error(`Delete failed: ${res.status}`);
           }
-          try {
-            const res = await fetch(`${this.apiUrl}/api/wishlist`, {
-              method: "POST",
-              credentials: "include",
-              headers: {
-                "Content-Type": "application/json",
-              },
-              body: JSON.stringify({ action: "DELETE", id:this.delete_id }),
-            });
 
-            if (!res.ok) {
-              throw new Error(`Delete failed: ${res.status}`);
-            }
+          await this.refresh();
+          alert('Item removed from Wishlist!');
+        } catch (err) {
+          console.error('Failed to remove wishlist item:', err);
+        }
+      },
 
-            await this.refresh();
-            alert('Item removed from Wishlist!');
-          } catch (err) {
-            console.error('Failed to remove wishlist item:', err);
-          }
-        },
-
-        async refresh() {
+      async refresh() {
         try {
           await this.fetchWishlist();
           this.isWishlisted = this.wishlist.includes(String(this.productId));
@@ -189,7 +205,7 @@
   "name": "Catalog Heart Icon",
   "target": "section",
   "settings": [
-    { "type": "product", "id": "product", "label": "product", "autofill": true },
+    { "type": "product", "id": "product", "label": "product", "autofill": true }
   ]
 }
 {% endschema %}
