@@ -50,7 +50,7 @@
 <script>
   document.addEventListener('alpine:init', () => {
     Alpine.data('wishlist', () => ({
-      apiUrl : "https://globe-founded-dvd-zope.trycloudflare.com",
+      apiUrl : "https://scores-chargers-creative-updated.trycloudflare.com",
       customerId: null,
       productId: null,
       productTitle: null,
@@ -137,7 +137,7 @@
               console.error("Add to wishlist failed", result.status);
             }
           })
-          .catch(error => console.log("error : ",error));
+          .catch(error => console.error("error : ",error));
       },
 
       async remove() {

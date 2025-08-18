@@ -118,13 +118,11 @@ export async function loader({ request }) {
 
     // If the shop has an active subscription, log and return the details
     const subscription = billingCheck.appSubscriptions[0];
-    console.log(`Shop is on ${subscription.name} (id ${subscription.id})`);
     return json({ billing, plan: subscription });
 
   } catch (error) {
     // If the shop does not have an active plan, return an empty plan object
     if (error.message === 'No active plan') {
-      console.log('Shop does not have any active plans.');
       return json({ billing, plan: { name: "Free" } });
     }
     // If there is another error, rethrow it
@@ -169,7 +167,6 @@ let planData = [
 export default function PricingPage() {
   const { plan } = useLoaderData();
 
-  console.log('plan', plan);
   return (
     <Page>
       <ui-title-bar title="Pricing" />

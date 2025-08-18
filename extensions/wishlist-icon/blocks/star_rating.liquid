@@ -19,7 +19,7 @@
         document.addEventListener('alpine:init', () => {
             Alpine.data('wishlist', () => ({
                 wishlisted: false,
-                apiUrl : "https://globe-founded-dvd-zope.trycloudflare.com",
+                apiUrl : "https://scores-chargers-creative-updated.trycloudflare.com",
 
                 addtoWishlist() {
                     var formData = new FormData();
@@ -46,7 +46,7 @@
                       }, 2000);
                       }
                     })
-                    .catch(error => console.log("error : ",error))
+                    .catch(error => console.error("error : ",error))
                 }
             }))
         })

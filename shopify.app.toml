@@ -3,7 +3,7 @@
 client_id = "299a9a9f32a21f497dab810906d3fd09"
 name = "wishlist-inspire"
 handle = "wishlist-inspire-373"
-application_url = "https://topic-mileage-disabled-dh.trycloudflare.com"
+application_url = "https://scores-chargers-creative-updated.trycloudflare.com"
 embedded = true
 
 [build]
@@ -17,9 +17,9 @@ scopes = "write_products"
 
 [auth]
 redirect_urls = [
-  "https://topic-mileage-disabled-dh.trycloudflare.com/auth/callback",
-  "https://topic-mileage-disabled-dh.trycloudflare.com/auth/shopify/callback",
-  "https://topic-mileage-disabled-dh.trycloudflare.com/api/auth/callback"
+  "https://scores-chargers-creative-updated.trycloudflare.com/auth/callback",
+  "https://scores-chargers-creative-updated.trycloudflare.com/auth/shopify/callback",
+  "https://scores-chargers-creative-updated.trycloudflare.com/api/auth/callback"
 ]
 
 [webhooks]
