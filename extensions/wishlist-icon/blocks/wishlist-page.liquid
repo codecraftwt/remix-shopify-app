@@ -71,7 +71,7 @@
 <script>
   document.addEventListener('alpine:init', () => {
     Alpine.data('wishlist', () => ({
-      apiUrl : "https://hollywood-sink-cardiff-outline.trycloudflare.com",
+      apiUrl : "https://pursuant-relating-witnesses-consequences.trycloudflare.com",
       customerId : null,
       items: [],
       Ids: [],
@@ -133,7 +133,8 @@
             },
             body: JSON.stringify({
               action: "DELETE",
-              id: product.id
+              id: product.id,
+              customerId: this.customerId || undefined
             }),
           });
 
@@ -161,7 +162,8 @@
             },
             body: JSON.stringify({
               action: "DELETE",
-              ids: this.Ids
+              ids: this.Ids,
+              customerId: this.customerId || undefined
             }),
           });
 

@@ -3,7 +3,7 @@
 client_id = "299a9a9f32a21f497dab810906d3fd09"
 name = "wishlist-inspire"
 handle = "wishlist-inspire-373"
-application_url = "https://hollywood-sink-cardiff-outline.trycloudflare.com"
+application_url = "https://pursuant-relating-witnesses-consequences.trycloudflare.com"
 embedded = true
 
 [build]
@@ -17,9 +17,9 @@ scopes = "write_products"
 
 [auth]
 redirect_urls = [
-  "https://hollywood-sink-cardiff-outline.trycloudflare.com/auth/callback",
-  "https://hollywood-sink-cardiff-outline.trycloudflare.com/auth/shopify/callback",
-  "https://hollywood-sink-cardiff-outline.trycloudflare.com/api/auth/callback"
+  "https://pursuant-relating-witnesses-consequences.trycloudflare.com/auth/callback",
+  "https://pursuant-relating-witnesses-consequences.trycloudflare.com/auth/shopify/callback",
+  "https://pursuant-relating-witnesses-consequences.trycloudflare.com/api/auth/callback"
 ]
 
 [webhooks]
