@@ -3,7 +3,7 @@
 client_id = "299a9a9f32a21f497dab810906d3fd09"
 name = "wishlist-inspire"
 handle = "wishlist-inspire-373"
-application_url = "https://groove-returns-pastor-mailing.trycloudflare.com"
+application_url = "https://rain-seriously-crucial-aye.trycloudflare.com"
 embedded = true
 
 [build]
@@ -17,9 +17,9 @@ scopes = "write_products"
 
 [auth]
 redirect_urls = [
-  "https://groove-returns-pastor-mailing.trycloudflare.com/auth/callback",
-  "https://groove-returns-pastor-mailing.trycloudflare.com/auth/shopify/callback",
-  "https://groove-returns-pastor-mailing.trycloudflare.com/api/auth/callback"
+  "https://rain-seriously-crucial-aye.trycloudflare.com/auth/callback",
+  "https://rain-seriously-crucial-aye.trycloudflare.com/auth/shopify/callback",
+  "https://rain-seriously-crucial-aye.trycloudflare.com/api/auth/callback"
 ]
 
 [webhooks]
