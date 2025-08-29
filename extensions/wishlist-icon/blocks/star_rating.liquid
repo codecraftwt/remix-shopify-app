@@ -1,4 +1,4 @@
-<div class="wishlist-button" x-data="wishlist">
+<div class="wishlist-button" x-data="wishlist" x-init="init()">
 
   <button type="button" @click="addtoWishlist" style="display: inline-flex; justify-content: center; align-items: center; width: 96%; height: 50px; background-color: #000; color: #fff; font-size: 1.4rem; font-weight: 500; border: none; border-radius: 4px; cursor: pointer;">
     <!-- Heart icon SVG on the left -->
@@ -14,12 +14,21 @@
 </div>
 
 <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
-
+    <script
+        dangerouslySetInnerHTML={{
+          __html: `window.APP_URL = "${APP_URL}";`,
+        }}
+    />
     <script>
         document.addEventListener('alpine:init', () => {
             Alpine.data('wishlist', () => ({
                 wishlisted: false,
-                apiUrl : "https://rain-seriously-crucial-aye.trycloudflare.com",
+                apiUrl : "https://break-est-doing-delivery.trycloudflare.com",
+                baseUrl : window.APP_URL,
+
+                init(){
+                  console.log(this.baseUrl,"baseUrl");
+                },
 
                 addtoWishlist() {
                     var formData = new FormData();
