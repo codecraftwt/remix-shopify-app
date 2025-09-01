@@ -10,7 +10,7 @@ export const loader = async ({ request }) => {
     throw redirect(`/app?${url.searchParams.toString()}`);
   }
 
-  return {APP_URL: process.env.APP_URL, showForm: Boolean(login) };
+  return {showForm: Boolean(login) };
 };
 
 export default function App() {

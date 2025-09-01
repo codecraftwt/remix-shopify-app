@@ -3,11 +3,11 @@
 client_id = "299a9a9f32a21f497dab810906d3fd09"
 name = "wishlist-inspire"
 handle = "wishlist-inspire-373"
-application_url = "https://break-est-doing-delivery.trycloudflare.com"
+application_url = "https://remix-shopify-app.onrender.com/"
 embedded = true
 
 [build]
-automatically_update_urls_on_dev = true
+automatically_update_urls_on_dev = false
 dev_store_url = "codecraft-team.myshopify.com"
 include_config_on_deploy = true
 
@@ -17,9 +17,9 @@ scopes = "write_products"
 
 [auth]
 redirect_urls = [
-  "https://break-est-doing-delivery.trycloudflare.com/auth/callback",
-  "https://break-est-doing-delivery.trycloudflare.com/auth/shopify/callback",
-  "https://break-est-doing-delivery.trycloudflare.com/api/auth/callback"
+  "https://remix-shopify-app.onrender.com//auth/callback",
+  "https://remix-shopify-app.onrender.com//auth/shopify/callback",
+  "https://remix-shopify-app.onrender.com//api/auth/callback"
 ]
 
 [webhooks]

@@ -47,15 +47,11 @@
 </div>
 
 <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
-  <script
-    dangerouslySetInnerHTML={{
-        __html: `window.APP_URL = "${APP_URL}";`,
-    }}
-   />
+  
 <script>
   document.addEventListener('alpine:init', () => {
     Alpine.data('wishlist', () => ({
-      apiUrl : "https://break-est-doing-delivery.trycloudflare.com",
+      apiUrl : "https://remix-shopify-app.onrender.com/",
       customerId: null,
       productId: null,
       productTitle: null,
@@ -64,10 +60,8 @@
       wishlist: [],
       allWishlistData: [],
       isWishlisted: false,
-      baseUrl : window.APP_URL,
 
       async init() {
-        console.log(this.baseUrl,"baseUrl");
         this.customerId = this.$el.dataset.customerId || null;
         await this.fetchWishlist();
         const parentElement = this.$el.closest('.catalog-heart-container');
