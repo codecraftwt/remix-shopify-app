@@ -1,4 +1,7 @@
 name = "wishlist-icon"
+
+uid = "23cc0911-4903-ae58-b04a-1a7627eee9a0470e04c9"
+
 type = "theme"
 
 [[blocks]]
